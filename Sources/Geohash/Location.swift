@@ -11,8 +11,8 @@ public class Location {
   static let radiansPerDegree    = Double.pi / 180.0
   static let earthDiameterMeters = 2.0 * 6_371_000.0
 
-  let longitude: Double
-  let latitude: Double
+  public let longitude: Double
+  public let latitude: Double
 
   public init(longitude lon: Double, latitude lat: Double) {
     self.longitude = lon
