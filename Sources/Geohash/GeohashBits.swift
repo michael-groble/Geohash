@@ -8,11 +8,6 @@
 
 import Foundation
 
-public enum GeohashError : Error {
-  case invalidPrecision
-  case invalidLocation
-}
-
 public struct GeohashBits {
   public let bits : UInt64
   public let precision : UInt8
@@ -89,7 +84,7 @@ public struct GeohashBits {
       latPrecision -= 1;
     }
 
-    return BoundingBox(
+    return try! BoundingBox(
       min: Location(longitude: unscaledBits(lonBits, range: longitudeRange, precision: self.precision),
                     latitude:  unscaledBits(latBits, range: latitudeRange,  precision: latPrecision)),
       max: Location(longitude: unscaledBits(lonBits + 1, range: longitudeRange, precision: self.precision),
