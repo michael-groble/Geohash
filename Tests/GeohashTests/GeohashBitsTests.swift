@@ -72,3 +72,18 @@ class GeohashBitsTests: XCTestCase {
     XCTAssertEqualWithAccuracy(bits.boundingBox().center().latitude,  51.4999982714653,    accuracy: 1.0e-13)
   }
 }
+
+extension GeohashBitsTests {
+  static var allTests = [
+    ("testEvenStringEncoding", testEvenStringEncoding),
+    ("testOddStringEncoding", testOddStringEncoding),
+    ("testEncodingTooLong", testEncodingTooLong),
+    ("testInvalidAngle", testInvalidAngle),
+    ("testEvenStringDecoding", testEvenStringDecoding),
+    ("testOddStringDecoding", testOddStringDecoding),
+    ("testEvenStringNeighbors", testEvenStringNeighbors),
+    ("testOddStringNeighbors", testOddStringNeighbors),
+    ("testEvenBinaryEncoding", testEvenBinaryEncoding),
+    ("testOddBinaryEncoding", testOddBinaryEncoding)
+  ]
+}
