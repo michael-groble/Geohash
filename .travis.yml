@@ -7,3 +7,5 @@ dist: trusty
 osx_image: xcode8
 script:
   - eval "$(curl -sL https://swift.vapor.sh/ci)"
+notifications:
+  email: false

@@ -1,5 +1,5 @@
 # Geohash
-[![Build Status](https://api.travis-ci.org/michael-groble/Geohash.svg?branch=master)](https://travis-ci.org/michael-groble/Geohash)
+[![Build Status](https://travis-ci.org/michael-groble/Geohash.svg?branch=master)](https://travis-ci.org/michael-groble/Geohash)
 
 Native Swift geohash package supporting binary and character encoding
 
