@@ -1,7 +1,7 @@
 import XCTest
 @testable import Geohash
 
-class LocationTests: XCTestCase {
+class GeohashBitsTests: XCTestCase {
 
   func testEvenStringEncoding() throws {
     let bits = try GeohashBits(location: Location(longitude: -0.1, latitude: 51.5), characterPrecision: 12)
