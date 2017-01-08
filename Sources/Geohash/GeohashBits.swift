@@ -14,8 +14,8 @@ public enum GeohashError : Error {
 }
 
 public struct GeohashBits {
-  let bits : UInt64
-  let precision : UInt8
+  public let bits : UInt64
+  public let precision : UInt8
   let fromString : Bool
 
   init(bits: UInt64, precision: UInt8, fromString: Bool) throws {
