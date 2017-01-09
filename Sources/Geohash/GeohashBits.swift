@@ -41,6 +41,10 @@ public struct GeohashBits {
     self.fromString = fromString
   }
 
+  public init(bits: UInt64, precision: UInt8) throws {
+    try self.init(bits: bits, precision: precision, fromString: false)
+  }
+
   public init(location: Location, bitPrecision: UInt8) throws {
     try self.init(location: location, precision: bitPrecision, fromString: false)
   }
