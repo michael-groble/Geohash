@@ -6,24 +6,24 @@
 //
 //
 
-class GeohashIterator : IteratorProtocol, Sequence {
+public class GeohashIterator : IteratorProtocol, Sequence {
 
   let bounds: BoundingBox
   var latBaseline: GeohashBits
   var current: GeohashBits?
 
-  init(bounds: BoundingBox, bitPrecision: UInt8) throws {
+  public init(bounds: BoundingBox, bitPrecision: UInt8) throws {
     self.bounds = bounds
     self.latBaseline = try GeohashBits(location: bounds.min, bitPrecision: bitPrecision)
     self.current = self.latBaseline
   }
 
-  func next() -> GeohashBits? {
+  public func next() -> GeohashBits? {
     defer { advanceCurrent() }
     return current
   }
 
-  func advanceCurrent() {
+  private func advanceCurrent() {
     // advance eastward until we are out of the bounds then advance northward
     if var bits = self.current {
       bits = bits.neighbor(.east)
