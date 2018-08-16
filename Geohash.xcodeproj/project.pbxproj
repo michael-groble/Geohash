@@ -130,7 +130,6 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_9 /* BoundingBox.swift */,
-				OBJ_10 /* Geohash.swift */,
 				OBJ_11 /* GeohashBits.swift */,
 				OBJ_12 /* GeohashIterator.swift */,
 				OBJ_13 /* Location.swift */,
@@ -161,6 +160,7 @@
 				5B593F162124CA2C00D8E353 /* Frameworks */,
 				5B593F172124CA2C00D8E353 /* Headers */,
 				5B593F182124CA2C00D8E353 /* Resources */,
+				5B593F3E2125BAC900D8E353 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -242,6 +242,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5B593F3E2125BAC900D8E353 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "if command -v swiftlint >/dev/null; then\n    git diff --name-only | while read -r filename; do\n    if [[ \"${filename#*.}\" = \"swift\" ]]; then\n       swiftlint lint --lenient --path \"$filename\";\n    fi\n    done\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5B593F152124CA2C00D8E353 /* Sources */ = {
