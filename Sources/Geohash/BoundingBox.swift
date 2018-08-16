@@ -7,6 +7,11 @@
 //
 
 public class BoundingBox {
+
+    public enum Error: Swift.Error {
+        case invalidArguments
+    }
+
   public let min: Location
   public let max: Location
 
@@ -14,7 +19,7 @@ public class BoundingBox {
     guard
       min.longitude <= max.longitude &&
       min.latitude  <= max.latitude else {
-        throw GeohashError.invalidArguments
+        throw Error.invalidArguments
     }
 
     self.min = min

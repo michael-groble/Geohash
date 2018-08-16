@@ -14,7 +14,6 @@
 		5B593F372124CB2800D8E353 /* GeohashIteratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* GeohashIteratorTests.swift */; };
 		5B593F382124CB2800D8E353 /* LocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* LocationTests.swift */; };
 		5B593F392124CB3900D8E353 /* BoundingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* BoundingBox.swift */; };
-		5B593F3A2124CB3900D8E353 /* Geohash.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* Geohash.swift */; };
 		5B593F3B2124CB3900D8E353 /* GeohashBits.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* GeohashBits.swift */; };
 		5B593F3C2124CB3900D8E353 /* GeohashIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* GeohashIterator.swift */; };
 		5B593F3D2124CB3900D8E353 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* Location.swift */; };
@@ -36,7 +35,6 @@
 		5B593F222124CA2C00D8E353 /* GeohashTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeohashTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B593F312124CA9A00D8E353 /* tests_info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = tests_info.plist; sourceTree = "<group>"; };
 		5B593F322124CA9A00D8E353 /* framework_info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = framework_info.plist; sourceTree = "<group>"; };
-		OBJ_10 /* Geohash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geohash.swift; sourceTree = "<group>"; };
 		OBJ_11 /* GeohashBits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeohashBits.swift; sourceTree = "<group>"; };
 		OBJ_12 /* GeohashIterator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeohashIterator.swift; sourceTree = "<group>"; };
 		OBJ_13 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
@@ -268,7 +266,6 @@
 				5B593F3C2124CB3900D8E353 /* GeohashIterator.swift in Sources */,
 				5B593F3D2124CB3900D8E353 /* Location.swift in Sources */,
 				5B593F3B2124CB3900D8E353 /* GeohashBits.swift in Sources */,
-				5B593F3A2124CB3900D8E353 /* Geohash.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

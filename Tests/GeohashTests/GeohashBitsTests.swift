@@ -13,19 +13,27 @@ class GeohashBitsTests: XCTestCase {
     XCTAssertEqual(bits.hash(), "gcpuvxr1jzf")
   }
 
-  func testEncodingTooLong() throws {
-    XCTAssertThrowsError(try GeohashBits(location: Location(longitude: -0.1, latitude: 51.5), characterPrecision: 13)) {
-      (error) -> Void in
-      XCTAssertEqual(error as? GeohashError, GeohashError.invalidPrecision)
+    func testEncodingTooLong() {
+        do {
+            let _ = try GeohashBits(location: Location(longitude: -0.1, latitude: 51.5),
+                                    characterPrecision: 13)
+        } catch GeohashBits.Error.invalidPrecision {
+            return
+        } catch {
+            XCTFail("Caught incorrect error type")
+        }
     }
-  }
 
-  func testInvalidAngle() throws {
-    XCTAssertThrowsError(try GeohashBits(location: Location(longitude: -200, latitude: 51.5), characterPrecision: 11)) {
-      (error) -> Void in
-      XCTAssertEqual(error as? GeohashError, GeohashError.invalidLocation)
+    func testInvalidAngle() {
+        do {
+            let _ = try GeohashBits(location: Location(longitude: -200, latitude: 51.5),
+                                    characterPrecision: 11)
+        } catch GeohashBits.Error.invalidLocation {
+            return
+        } catch {
+            XCTFail("Caught incorrect error type")
+        }
     }
-  }
 
   func testEvenStringDecoding() throws {
     let bits = try GeohashBits(hash: "u10hfr2c4pv6")

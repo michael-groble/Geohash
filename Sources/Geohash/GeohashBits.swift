@@ -9,13 +9,19 @@
 import Foundation
 
 public struct GeohashBits {
+
+    public enum Error: Swift.Error {
+        case invalidPrecision
+        case invalidLocation
+    }
+
   public let bits : UInt64
   public let precision : UInt8
   let fromString : Bool
 
   init(bits: UInt64, precision: UInt8, fromString: Bool) throws {
     guard precision <= 32 else {
-      throw GeohashError.invalidPrecision
+      throw Error.invalidPrecision
     }
 
     self.bits = bits
@@ -25,12 +31,12 @@ public struct GeohashBits {
 
   init(location: Location, precision: UInt8, fromString: Bool) throws {
     guard precision <= 32 else {
-      throw GeohashError.invalidPrecision
+      throw Error.invalidPrecision
     }
 
     guard longitudeRange.contains(location.longitude) &&
       latitudeRange.contains(location.latitude) else {
-        throw GeohashError.invalidLocation
+        throw Error.invalidLocation
     }
 
     let latitudeBits  = scaledBits(location.latitude,  range: latitudeRange,  precision: precision)
