@@ -1,11 +1,3 @@
-//
-//  BoundingBoxTests.swift
-//  Geohash
-//
-//  Created by michael groble on 1/8/17.
-//
-//
-
 import XCTest
 @testable import Geohash
 
@@ -44,6 +36,6 @@ class BoundingBoxTests: XCTestCase {
 extension BoundingBoxTests {
     static var allTests = [
         ("testIntersectsIntersecting", testIntersectsIntersecting),
-    ("testIntersectsNonIntersecting", testIntersectsNonIntersecting),
+        ("testIntersectsNonIntersecting", testIntersectsNonIntersecting)
     ]
 }

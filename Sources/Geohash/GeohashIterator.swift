@@ -1,11 +1,3 @@
-//
-//  GeohashIterator.swift
-//  Geohash
-//
-//  Created by michael groble on 1/12/17.
-//
-//
-
 public class GeohashIterator: IteratorProtocol, Sequence {
     
     let bounds: BoundingBox

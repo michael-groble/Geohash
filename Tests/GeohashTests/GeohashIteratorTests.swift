@@ -1,12 +1,5 @@
-//
-//  GeohashIteratorTests.swift
-//  Geohash
-//
-//  Created by michael groble on 1/12/17.
-//
-//
-
 import XCTest
+
 @testable import Geohash
 
 class GeohashIteratorTests: XCTestCase {
@@ -28,16 +21,16 @@ class GeohashIteratorTests: XCTestCase {
     
     func testIterateLevel8() throws {
         let subject = try GeohashIterator(bounds: bounds, bitPrecision: 20)
-    XCTAssertEqual(subject.next()!.hash(), "u10hfr2c")
-    XCTAssertEqual(subject.next()!.hash(), "u10hfr31")
-    XCTAssertEqual(subject.next()!.hash(), "u10hfr2f")
-    XCTAssertEqual(subject.next()!.hash(), "u10hfr34")
+        XCTAssertEqual(subject.next()?.hash(), "u10hfr2c")
+        XCTAssertEqual(subject.next()?.hash(), "u10hfr31")
+        XCTAssertEqual(subject.next()?.hash(), "u10hfr2f")
+        XCTAssertEqual(subject.next()?.hash(), "u10hfr34")
         XCTAssertNil(subject.next())
     }
 }
 
 extension GeohashIteratorTests {
     static var allTests = [
-    ("testIterateLevel8", testIterateLevel8),
+        ("testIterateLevel8", testIterateLevel8)
     ]
 }

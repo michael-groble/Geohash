@@ -1,10 +1,3 @@
-//
-//  Geohash.h
-//  Geohash
-//
-//  Created by Robert Edwards on 8/15/18.
-//
-
 #import <UIKit/UIKit.h>
 
 //! Project version number for Geohash.
@@ -14,5 +7,3 @@ FOUNDATION_EXPORT double GeohashVersionNumber;
 FOUNDATION_EXPORT const unsigned char GeohashVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <Geohash/PublicHeader.h>
-
-

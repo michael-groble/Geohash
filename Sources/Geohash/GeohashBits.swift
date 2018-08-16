@@ -1,10 +1,4 @@
-//
-//  GeohashBits.swift
-//  Geohash
-//
-//  Created by michael groble on 1/6/17.
-//
-//
+// swiftlint:disable identifier_name
 
 import Foundation
 
@@ -188,20 +182,20 @@ public struct GeohashBits {
     
 }
 
-fileprivate let longitudeRange = -180.0...180.0
-fileprivate let latitudeRange = -90.0...90.0
+private let longitudeRange = -180.0...180.0
+private let latitudeRange = -90.0...90.0
 
-fileprivate func scaledBits(_ x: Double, range: ClosedRange<Double>, precision: UInt8) -> UInt32 {
+private func scaledBits(_ x: Double, range: ClosedRange<Double>, precision: UInt8) -> UInt32 {
     let fraction = (x - range.lowerBound) / (range.upperBound - range.lowerBound)
     return UInt32(fraction * Double(UInt64(1) << UInt64(precision)))
 }
 
-fileprivate func unscaledBits(_ bits: UInt32, range: ClosedRange<Double>, precision: UInt8) -> Double {
+private func unscaledBits(_ bits: UInt32, range: ClosedRange<Double>, precision: UInt8) -> Double {
     let fraction = Double(bits) / Double(UInt64(1) << UInt64(precision))
     return range.lowerBound + fraction * (range.upperBound - range.lowerBound)
 }
 
-fileprivate func interleave(evenBits: UInt32, oddBits: UInt32) -> UInt64 {
+private func interleave(evenBits: UInt32, oddBits: UInt32) -> UInt64 {
     // swift doesn't expose vector_ulong2, otherwise we would try that
     var e = UInt64(evenBits)
     var o = UInt64(oddBits)
@@ -224,7 +218,7 @@ fileprivate func interleave(evenBits: UInt32, oddBits: UInt32) -> UInt64 {
     return e | (o << 1)
 }
 
-fileprivate func deinterleave(_ interleaved: UInt64) -> (evenBits: UInt32, oddBits: UInt32) {
+private func deinterleave(_ interleaved: UInt64) -> (evenBits: UInt32, oddBits: UInt32) {
     var e = interleaved        & 0x5555555555555555
     var o = (interleaved >> 1) & 0x5555555555555555
     
@@ -246,9 +240,9 @@ fileprivate func deinterleave(_ interleaved: UInt64) -> (evenBits: UInt32, oddBi
     return (evenBits: UInt32(e), oddBits: UInt32(o))
 }
 
-fileprivate let base32Characters = Array("0123456789bcdefghjkmnpqrstuvwxyz")
+private let base32Characters = Array("0123456789bcdefghjkmnpqrstuvwxyz")
 
-fileprivate let base32Bits = { () -> [Character: UInt64] in
+private let base32Bits = { () -> [Character: UInt64] in
     // reduce does not work here since the accumulator is not inout
     var hash = [Character: UInt64]()
     for (i, c) in base32Characters.enumerated() {

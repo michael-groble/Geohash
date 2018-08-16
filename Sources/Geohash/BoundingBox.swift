@@ -1,11 +1,3 @@
-//
-//  BoundingBox.swift
-//  Geohash
-//
-//  Created by michael groble on 1/6/17.
-//
-//
-
 public class BoundingBox {
     
     public enum Error: Swift.Error {
@@ -31,7 +23,7 @@ public class BoundingBox {
             latitude: 0.5 * (min.latitude + max.latitude))
     }
     
-  /// - todo: support wrap-around at the 180th meridian
+    // TODO: support wrap-around at the 180th meridian
     public func intersects(_ other: BoundingBox) -> Bool {
         guard max.longitude > other.min.longitude,
             max.latitude > other.min.latitude,
