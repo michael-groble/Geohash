@@ -27,9 +27,8 @@ public class BoundingBox {
     
     public func center() -> Location {
         return Location(
-            longitude: 0.5 * (self.min.longitude + self.max.longitude),
-      latitude:  0.5 * (self.min.latitude + self.max.latitude)
-    )
+            longitude: 0.5 * (min.longitude + max.longitude),
+            latitude: 0.5 * (min.latitude + max.latitude))
     }
     
   /// - todo: support wrap-around at the 180th meridian

@@ -78,10 +78,10 @@ public struct GeohashBits {
     
     public func hash() -> String {
         var hash = ""
-    let characterPrecision = UInt8(0.4 * Double(self.precision))
+        let characterPrecision = UInt8(0.4 * Double(precision))
         
         for i in 1...characterPrecision {
-      let index = (self.bits >> UInt64(2 * self.precision - i * 5)) & 0x1f
+            let index = (bits >> UInt64(2 * precision - i * 5)) & 0x1f
             hash += String(base32Characters[Int(index)])
         }
         
@@ -89,12 +89,12 @@ public struct GeohashBits {
     }
     
     public func boundingBox() -> BoundingBox {
-    var (latBits, lonBits) = deinterleave(self.bits)
-    var latPrecision = self.precision
+        var (latBits, lonBits) = deinterleave(bits)
+        var latPrecision = precision
         
-    if (self.fromString && (self.precision % 5) > 0) {
-      latBits >>= 1;
-      latPrecision -= 1;
+        if fromString && (precision % 5) > 0 {
+            latBits >>= 1
+            latPrecision -= 1
         }
 
         let minLocation = Location(longitude: unscaledBits(lonBits, range: longitudeRange, precision: precision),
@@ -156,26 +156,25 @@ public struct GeohashBits {
             return self
         }
         
-    var modifyBits = self.bits & set.modifyMask()
-    let keepBits = self.bits & set.keepMask()
-    let increment = set.keepMask() >> (UInt64(64) - UInt64(self.precision) * 2)
+        var modifyBits = bits & set.modifyMask()
+        let keepBits = bits & set.keepMask()
+        let increment = set.keepMask() >> (UInt64(64) - UInt64(precision) * 2)
         
-    let shiftBits = set == .evens && self.fromString && (self.precision % 5) > 0
+        let shiftBits = set == .evens && fromString && (precision % 5) > 0
         
         if shiftBits {
-      modifyBits >>= 2;
+            modifyBits >>= 2
         }
         
         if direction > 0 {
             modifyBits += (increment + 1)
-    }
-    else {
+        } else {
             modifyBits |= increment
             modifyBits -= (increment + 1)
         }
         
         if shiftBits {
-      modifyBits <<= 2;
+            modifyBits <<= 2
         }
         
         modifyBits &= set.modifyMask() >> (UInt64(64) - UInt64(precision) * 2)
