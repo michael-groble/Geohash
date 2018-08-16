@@ -1,4 +1,9 @@
+# Xcode 
+**/xcuserdata
+*.xccheckout
+
+# OS X
 .DS_Store
+
+# Swift Package Manager
 /.build
-/Packages
-/*.xcodeproj
