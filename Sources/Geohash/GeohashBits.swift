@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import simd
 
 public struct GeohashBits {
   public let bits : UInt64
@@ -56,11 +57,11 @@ public struct GeohashBits {
   }
 
   public init(hash: String) throws {
-    let bitLength = hash.characters.count * 5
+    let bitLength = hash.count * 5
     let precision = UInt8(ceil(0.5 * Double(bitLength)))
 
     var bits = UInt64(0)
-    for (i, c) in hash.characters.enumerated() {
+    for (i, c) in hash.enumerated() {
       bits |= (base32Bits[c]! << (2 * UInt64(precision) - (UInt64(i) + 1) * 5))
     }
 
@@ -231,7 +232,7 @@ fileprivate func deinterleave(_ interleaved: UInt64) -> (evenBits: UInt32, oddBi
   return (evenBits: UInt32(e), oddBits: UInt32(o))
 }
 
-fileprivate let base32Characters = Array("0123456789bcdefghjkmnpqrstuvwxyz".characters)
+fileprivate let base32Characters = Array("0123456789bcdefghjkmnpqrstuvwxyz")
 
 fileprivate let base32Bits = { () -> [Character: UInt64] in
   // reduce does not work here since the accumulator is not inout
