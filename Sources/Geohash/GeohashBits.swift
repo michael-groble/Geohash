@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import simd
 
 public struct GeohashBits {
   public let bits : UInt64
@@ -56,11 +57,11 @@ public struct GeohashBits {
   }
 
   public init(hash: String) throws {
-    let bitLength = hash.characters.count * 5
+    let bitLength = hash.count * 5
     let precision = UInt8(ceil(0.5 * Double(bitLength)))
 
     var bits = UInt64(0)
-    for (i, c) in hash.characters.enumerated() {
+    for (i, c) in hash.enumerated() {
       bits |= (base32Bits[c]! << (2 * UInt64(precision) - (UInt64(i) + 1) * 5))
     }
 
@@ -187,51 +188,33 @@ fileprivate func unscaledBits(_ bits: UInt32, range: ClosedRange<Double>, precis
 }
 
 fileprivate func interleave(evenBits: UInt32, oddBits: UInt32) -> UInt64 {
-  // swift doesn't expose vector_ulong2, otherwise we would try that
-  var e = UInt64(evenBits)
-  var o = UInt64(oddBits)
+  var bits = SIMD2<UInt64>(UInt64(evenBits), UInt64(oddBits));
 
-  e = (e | (e << 16)) & 0x0000FFFF0000FFFF
-  o = (o | (o << 16)) & 0x0000FFFF0000FFFF
+  bits = (bits | (bits &<< UInt64(16))) & SIMD2<UInt64>(0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF);
+  bits = (bits | (bits &<< UInt64( 8))) & SIMD2<UInt64>(0x00FF00FF00FF00FF, 0x00FF00FF00FF00FF);
+  bits = (bits | (bits &<< UInt64( 4))) & SIMD2<UInt64>(0x0F0F0F0F0F0F0F0F, 0x0F0F0F0F0F0F0F0F);
+  bits = (bits | (bits &<< UInt64( 2))) & SIMD2<UInt64>(0x3333333333333333, 0x3333333333333333);
+  bits = (bits | (bits &<< UInt64( 1))) & SIMD2<UInt64>(0x5555555555555555, 0x5555555555555555);
 
-  e = (e | (e <<  8)) & 0x00FF00FF00FF00FF
-  o = (o | (o <<  8)) & 0x00FF00FF00FF00FF
-
-  e = (e | (e <<  4)) & 0x0F0F0F0F0F0F0F0F
-  o = (o | (o <<  4)) & 0x0F0F0F0F0F0F0F0F
-
-  e = (e | (e <<  2)) & 0x3333333333333333
-  o = (o | (o <<  2)) & 0x3333333333333333
-
-  e = (e | (e <<  1)) & 0x5555555555555555
-  o = (o | (o <<  1)) & 0x5555555555555555
-
-  return e | (o << 1)
+  return bits.x | (bits.y << 1)
 }
 
 fileprivate func deinterleave(_ interleaved: UInt64) -> (evenBits: UInt32, oddBits: UInt32) {
-  var e = interleaved        & 0x5555555555555555
-  var o = (interleaved >> 1) & 0x5555555555555555
+  var bits = SIMD2<UInt64>(
+    interleaved        & 0x5555555555555555,
+    (interleaved >> 1) & 0x5555555555555555
+  )
 
-  e = (e | (e >>  1)) & 0x3333333333333333
-  o = (o | (o >>  1)) & 0x3333333333333333
+  bits = (bits | (bits &>> UInt64( 1))) & SIMD2<UInt64>(0x3333333333333333, 0x3333333333333333);
+  bits = (bits | (bits &>> UInt64( 2))) & SIMD2<UInt64>(0x0F0F0F0F0F0F0F0F, 0x0F0F0F0F0F0F0F0F);
+  bits = (bits | (bits &>> UInt64( 4))) & SIMD2<UInt64>(0x00FF00FF00FF00FF, 0x00FF00FF00FF00FF);
+  bits = (bits | (bits &>> UInt64( 8))) & SIMD2<UInt64>(0x0000FFFF0000FFFF, 0x0000FFFF0000FFFF);
+  bits = (bits | (bits &>> UInt64(16))) & SIMD2<UInt64>(0x00000000FFFFFFFF, 0x00000000FFFFFFFF);
 
-  e = (e | (e >>  2)) & 0x0F0F0F0F0F0F0F0F
-  o = (o | (o >>  2)) & 0x0F0F0F0F0F0F0F0F
-
-  e = (e | (e >>  4)) & 0x00FF00FF00FF00FF
-  o = (o | (o >>  4)) & 0x00FF00FF00FF00FF
-
-  e = (e | (e >>  8)) & 0x0000FFFF0000FFFF
-  o = (o | (o >>  8)) & 0x0000FFFF0000FFFF
-
-  e = (e | (e >> 16)) & 0x00000000FFFFFFFF
-  o = (o | (o >> 16)) & 0x00000000FFFFFFFF
-
-  return (evenBits: UInt32(e), oddBits: UInt32(o))
+  return (evenBits: UInt32(bits.x), oddBits: UInt32(bits.y))
 }
 
-fileprivate let base32Characters = Array("0123456789bcdefghjkmnpqrstuvwxyz".characters)
+fileprivate let base32Characters = Array("0123456789bcdefghjkmnpqrstuvwxyz")
 
 fileprivate let base32Bits = { () -> [Character: UInt64] in
   // reduce does not work here since the accumulator is not inout
