@@ -14,7 +14,7 @@ public class GeohashIterator : IteratorProtocol, Sequence {
 
   public init(bounds: BoundingBox, bitPrecision: UInt8) throws {
     self.bounds = bounds
-    self.latBaseline = try GeohashBits(location: bounds.min, bitPrecision: bitPrecision)
+    self.latBaseline = try GeohashBits(location: bounds.min, precision: Precision.bits(bitPrecision))
     self.current = self.latBaseline
   }
 

@@ -9,23 +9,57 @@
 import Foundation
 import simd
 
+public enum Precision {
+  case bits(UInt8)
+  case characters(UInt8)
+
+  func binaryPrecision() -> UInt8 {
+    switch self {
+    case .bits(let n):
+      return n
+    case .characters(let n):
+      return UInt8(ceil(0.5 * Double(5 * n)))
+    }
+  }
+
+  func characterPrecision() -> UInt8 {
+    switch self {
+    case .bits(let n):
+      return UInt8(0.4 * Double(n))
+    case .characters(let n):
+      return n
+    }
+  }
+
+  func maxBinaryValue() -> Double {
+    return Double(UInt64(1) << UInt64(binaryPrecision()))
+  }
+
+  func isOddCharacters() -> Bool {
+    switch self {
+    case .bits:
+      return false
+    case .characters(let n):
+      return (n % 2) > 0
+    }
+  }
+}
+
 public struct GeohashBits {
   public let bits : UInt64
-  public let precision : UInt8
-  let fromString : Bool
+  public let precision : Precision
 
-  init(bits: UInt64, precision: UInt8, fromString: Bool) throws {
-    guard precision <= 32 else {
+  init(bits: UInt64, precision: Precision) throws {
+    guard precision.binaryPrecision() <= 32 else {
       throw GeohashError.invalidPrecision
     }
 
     self.bits = bits
     self.precision = precision
-    self.fromString = fromString
   }
 
-  init(location: Location, precision: UInt8, fromString: Bool) throws {
-    guard precision <= 32 else {
+  public init(location: Location, precision: Precision) throws {
+    guard precision.binaryPrecision() <= 32 else {
       throw GeohashError.invalidPrecision
     }
 
@@ -34,46 +68,36 @@ public struct GeohashBits {
         throw GeohashError.invalidLocation
     }
 
-    let latitudeBits  = scaledBits(location.latitude,  range: latitudeRange,  precision: precision)
-    let longitudeBits = scaledBits(location.longitude, range: longitudeRange, precision: precision)
+    let latitudeBits  = doubleToBits(location.latitude,  range: latitudeRange,  maxBinaryValue: precision.maxBinaryValue())
+    let longitudeBits = doubleToBits(location.longitude, range: longitudeRange, maxBinaryValue: precision.maxBinaryValue())
 
     self.bits = interleave(evenBits: latitudeBits, oddBits: longitudeBits)
     self.precision = precision
-    self.fromString = fromString
   }
 
-  public init(bits: UInt64, precision: UInt8) throws {
-    try self.init(bits: bits, precision: precision, fromString: false)
-  }
-
-  public init(location: Location, bitPrecision: UInt8) throws {
-    try self.init(location: location, precision: bitPrecision, fromString: false)
-  }
-
-  public init(location: Location, characterPrecision: UInt8) throws {
-    let bitLength = characterPrecision * 5
-    let precision = UInt8(ceil(0.5 * Double(bitLength)))
-    try self.init(location: location, precision: precision, fromString: true)
-  }
+//  public init(bits: UInt64, precision: UInt8) throws {
+//    try self.init(bits: bits, precision: Precision.bits(precision))
+//  }
 
   public init(hash: String) throws {
-    let bitLength = hash.count * 5
-    let precision = UInt8(ceil(0.5 * Double(bitLength)))
+    let precision = Precision.characters(UInt8(hash.count))
+    let totalBinaryPrecision = UInt64(2 * precision.binaryPrecision())
 
     var bits = UInt64(0)
     for (i, c) in hash.enumerated() {
-      bits |= (base32Bits[c]! << (2 * UInt64(precision) - (UInt64(i) + 1) * 5))
+      bits |= (base32Bits[c]! << (totalBinaryPrecision - (UInt64(i) + 1) * 5))
     }
 
-    try self.init(bits: bits, precision: precision, fromString: true)
+    try self.init(bits: bits, precision: precision)
   }
 
   public func hash() -> String {
     var hash = ""
-    let characterPrecision = UInt8(0.4 * Double(self.precision))
+    let characterPrecision = self.precision.characterPrecision();
+    let totalBinaryPrecision = 2 * self.precision.binaryPrecision();
 
     for i in 1...characterPrecision {
-      let index = (self.bits >> UInt64(2 * self.precision - i * 5)) & 0x1f
+      let index = (self.bits >> UInt64(totalBinaryPrecision - i * 5)) & 0x1f
       hash += String(base32Characters[Int(index)])
     }
 
@@ -84,16 +108,16 @@ public struct GeohashBits {
     var (latBits, lonBits) = deinterleave(self.bits)
     var latPrecision = self.precision
 
-    if (self.fromString && (self.precision % 5) > 0) {
+    if (self.precision.isOddCharacters()) {
       latBits >>= 1;
-      latPrecision -= 1;
+      latPrecision = Precision.bits(latPrecision.binaryPrecision() - 1);
     }
 
     return try! BoundingBox(
-      min: Location(longitude: unscaledBits(lonBits, range: longitudeRange, precision: self.precision),
-                    latitude:  unscaledBits(latBits, range: latitudeRange,  precision: latPrecision)),
-      max: Location(longitude: unscaledBits(lonBits + 1, range: longitudeRange, precision: self.precision),
-                    latitude:  unscaledBits(latBits + 1, range: latitudeRange,  precision: latPrecision))
+      min: Location(longitude: bitsToDouble(lonBits, range: longitudeRange, maxBinaryValue: self.precision.maxBinaryValue()),
+                    latitude:  bitsToDouble(latBits, range: latitudeRange,  maxBinaryValue: latPrecision.maxBinaryValue())),
+      max: Location(longitude: bitsToDouble(lonBits + 1, range: longitudeRange, maxBinaryValue: self.precision.maxBinaryValue()),
+                    latitude:  bitsToDouble(latBits + 1, range: latitudeRange,  maxBinaryValue: latPrecision.maxBinaryValue()))
     )
   }
 
@@ -147,9 +171,10 @@ public struct GeohashBits {
 
     var modifyBits = self.bits & set.modifyMask()
     let keepBits = self.bits & set.keepMask()
-    let increment = set.keepMask() >> (UInt64(64) - UInt64(self.precision) * 2)
+    let binaryPrecision = UInt64(self.precision.binaryPrecision())
+    let increment = set.keepMask() >> (64 - 2 * binaryPrecision)
 
-    let shiftBits = set == .evens && self.fromString && (self.precision % 5) > 0
+    let shiftBits = set == .evens && self.precision.isOddCharacters()
 
     if shiftBits {
       modifyBits >>= 2;
@@ -167,9 +192,9 @@ public struct GeohashBits {
       modifyBits <<= 2;
     }
     
-    modifyBits &= set.modifyMask() >> (UInt64(64) - UInt64(self.precision) * 2)
+    modifyBits &= set.modifyMask() >> (64 - 2 * binaryPrecision)
 
-    return try! GeohashBits(bits: modifyBits | keepBits, precision: self.precision, fromString: self.fromString)
+    return try! GeohashBits(bits: modifyBits | keepBits, precision: self.precision)
   }
 
 }
@@ -177,13 +202,13 @@ public struct GeohashBits {
 fileprivate let longitudeRange = -180.0...180.0
 fileprivate let latitudeRange = -90.0...90.0
 
-fileprivate func scaledBits(_ x: Double, range: ClosedRange<Double>, precision: UInt8) -> UInt32 {
+fileprivate func doubleToBits(_ x: Double, range: ClosedRange<Double>, maxBinaryValue: Double) -> UInt32 {
   let fraction = (x - range.lowerBound) / (range.upperBound - range.lowerBound)
-  return UInt32(fraction * Double(UInt64(1) << UInt64(precision)))
+  return UInt32(fraction * maxBinaryValue)
 }
 
-fileprivate func unscaledBits(_ bits: UInt32, range: ClosedRange<Double>, precision: UInt8) -> Double {
-  let fraction = Double(bits) / Double(UInt64(1) << UInt64(precision))
+fileprivate func bitsToDouble(_ bits: UInt32, range: ClosedRange<Double>, maxBinaryValue: Double) -> Double {
+  let fraction = Double(bits) / maxBinaryValue
   return range.lowerBound + fraction * (range.upperBound - range.lowerBound)
 }
 

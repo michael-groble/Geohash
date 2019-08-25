@@ -3,6 +3,8 @@
 
 Native Swift geohash package supporting binary and character encoding
 
+I also have a [Rust version](https://github.com/michael-groble/Geohash-rust)
+
 Geohashes are represented internally as 64 bit integers.  A hash can be constructed either using character
 precision (up to 12 characters) or binary precision (up to 32 bits per angle).
 
