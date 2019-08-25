@@ -1,6 +1,8 @@
 os:
   - linux
+  env: SWIFT_SNAPSHOT=5.0.1
   - osx
+  env: SWIFT_SNAPSHOT=5.0.1
 language: generic
 sudo: required
 dist: trusty
