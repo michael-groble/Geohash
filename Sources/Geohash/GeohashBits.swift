@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import simd
 
 public enum Precision {
   case bits(UInt8)
@@ -74,10 +73,6 @@ public struct GeohashBits {
     self.bits = interleave(evenBits: latitudeBits, oddBits: longitudeBits)
     self.precision = precision
   }
-
-//  public init(bits: UInt64, precision: UInt8) throws {
-//    try self.init(bits: bits, precision: Precision.bits(precision))
-//  }
 
   public init(hash: String) throws {
     let precision = Precision.characters(UInt8(hash.count))
@@ -212,6 +207,10 @@ fileprivate func bitsToDouble(_ bits: UInt32, range: ClosedRange<Double>, maxBin
   return range.lowerBound + fraction * (range.upperBound - range.lowerBound)
 }
 
+#if canImport(simd)
+
+import simd
+
 fileprivate func interleave(evenBits: UInt32, oddBits: UInt32) -> UInt64 {
   var bits = SIMD2<UInt64>(UInt64(evenBits), UInt64(oddBits));
 
@@ -238,6 +237,56 @@ fileprivate func deinterleave(_ interleaved: UInt64) -> (evenBits: UInt32, oddBi
 
   return (evenBits: UInt32(bits.x), oddBits: UInt32(bits.y))
 }
+
+#else
+
+fileprivate func interleave(evenBits: UInt32, oddBits: UInt32) -> UInt64 {
+  // swift doesn't expose vector_ulong2, otherwise we would try that
+  var e = UInt64(evenBits)
+  var o = UInt64(oddBits)
+
+  e = (e | (e << 16)) & 0x0000FFFF0000FFFF
+  o = (o | (o << 16)) & 0x0000FFFF0000FFFF
+
+  e = (e | (e <<  8)) & 0x00FF00FF00FF00FF
+  o = (o | (o <<  8)) & 0x00FF00FF00FF00FF
+
+  e = (e | (e <<  4)) & 0x0F0F0F0F0F0F0F0F
+  o = (o | (o <<  4)) & 0x0F0F0F0F0F0F0F0F
+
+  e = (e | (e <<  2)) & 0x3333333333333333
+  o = (o | (o <<  2)) & 0x3333333333333333
+
+  e = (e | (e <<  1)) & 0x5555555555555555
+  o = (o | (o <<  1)) & 0x5555555555555555
+
+  return e | (o << 1)
+}
+
+fileprivate func deinterleave(_ interleaved: UInt64) -> (evenBits: UInt32, oddBits: UInt32) {
+  var e = interleaved        & 0x5555555555555555
+  var o = (interleaved >> 1) & 0x5555555555555555
+
+  e = (e | (e >>  1)) & 0x3333333333333333
+  o = (o | (o >>  1)) & 0x3333333333333333
+
+  e = (e | (e >>  2)) & 0x0F0F0F0F0F0F0F0F
+  o = (o | (o >>  2)) & 0x0F0F0F0F0F0F0F0F
+
+  e = (e | (e >>  4)) & 0x00FF00FF00FF00FF
+  o = (o | (o >>  4)) & 0x00FF00FF00FF00FF
+
+  e = (e | (e >>  8)) & 0x0000FFFF0000FFFF
+  o = (o | (o >>  8)) & 0x0000FFFF0000FFFF
+
+  e = (e | (e >> 16)) & 0x00000000FFFFFFFF
+  o = (o | (o >> 16)) & 0x00000000FFFFFFFF
+
+  return (evenBits: UInt32(e), oddBits: UInt32(o))
+}
+
+#endif
+
 
 fileprivate let base32Characters = Array("0123456789bcdefghjkmnpqrstuvwxyz")
 
