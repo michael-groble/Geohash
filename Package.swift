@@ -14,6 +14,11 @@ let package = Package(
     ),
     .testTarget(
       name: "GeohashTests",
-      dependencies: ["Geohash"]),
+      dependencies: ["Geohash"]
+    ),
+    .testTarget(
+      name: "BenchmarkTests",
+      dependencies: ["Geohash"]
+    ),
   ]
 )
